@@ -3,9 +3,8 @@ args <- commandArgs(trailingOnly = TRUE)
 libname=args[1]
 diamtablename=args[2]
 vcffile=args[3]
-regionsname=args[4]
-ampliconsname=args[5]
-pindelresults=args[6]
+targetsname=args[4]
+pindelresults=args[5]
 
 for(i in 1:5)
 {

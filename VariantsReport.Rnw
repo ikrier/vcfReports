@@ -53,9 +53,119 @@
  
 % This section should include :
 % - The total number of variants found (off target and on target) after the filtering step
+\begin{center}
+<<label=table1, results=tex, echo=FALSE,width=8,height=4>>=
+library("VariantAnnotation")
+myvcf=readVcf(file = vcffile,genome = "hg19")
+
+library("rtracklayer")
+targetregions=import.bed(targetsname)[[1]]
+seqlevels(targetregions)=substr(seqlevels(targetregions),4,5)
+
+myvcf@fixed$FILTER=c("off_target","on_target")[countOverlaps(myvcf@rowData,targetregions)+1]
+mytable=table(myvcf@fixed$FILTER)
+library(xtable)
+df=data.frame(on_target=mytable["on_target"],
+              off_target=mytable["off_target"])
+strCaption <- paste0("\\textbf{Variants found} We excluded off-target variants from this report.")
+print(xtable(df, digits=2, caption=strCaption, label="StatsTable"), 
+      size="footnotesize", #Change size; useful for bigger tables
+      include.rownames=FALSE, #Don't print rownames
+      include.colnames=FALSE, #We create them ourselves
+      caption.placement="top", 
+      hline.after=NULL, #We don't need hline; we use booktabs
+      add.to.row = list(pos = list(-1, 
+                                   nrow(df)),
+                        command = c(paste("\\toprule \n",
+                                          "Number on target & Number off target  \\\\\n", 
+                                          "\\midrule \n"),
+                                    "\\bottomrule \n")
+                        )
+      )
+
+@
+\end{center}
+
+
 % - The ratio of transversions to transitions (which should be around ts/tv=2-2.1) (only for the filtered set)
-% - Number of genes with a COSMIC mutatinons
-% - Number of genes with a routinely checked mutation
+\begin{center}
+<<label=table2, results=tex, echo=FALSE,width=8,height=4>>=
+get_tsovertv=function(vcf)
+{
+  transitions=sum(isTransition(vcf))
+  transversions=sum(!isTransition((vcf)))
+  ratio=transitions/transversions
+  return(list(transitions=transitions,transversions=transversions,ratio=ratio))
+}
+ratio=get_tsovertv(myvcf)
+df=data.frame(transversions=ratio["transversions"],
+              transitions=ratio["transitions"],
+              ratio=ratio["ratio"])
+strCaption <- paste0("\\textbf{Transversions and transitions} Statistically, transitions (A<->G and T<->C) are more probable than transversions (any other change) because the first are purine to purine or pyrimidine to pyrimidine. Human exome data is expected to have a transition/transversion ratio around 2-2.5.")
+print(xtable(df, digits=2, caption=strCaption, label="ti/tvratio"), 
+      size="footnotesize", #Change size; useful for bigger tables
+      include.rownames=FALSE, #Don't print rownames
+      include.colnames=FALSE, #We create them ourselves
+      caption.placement="top", 
+      hline.after=NULL, #We don't need hline; we use booktabs
+      add.to.row = list(pos = list(-1, 
+                                   nrow(df)),
+                        command = c(paste("\\toprule \n",
+                                          "Number of transversions & Number of transitions &  Ratio \\\\\n", 
+                                          "\\midrule \n"),
+                                    "\\bottomrule \n")
+                        )
+      )
+
+@
+\end{center}
+% - Genes with a COSMIC mutations, highlight those with haematopoietic annotation
+\begin{center}
+<<label=table2, results=tex, echo=FALSE,width=8,height=4>>=
+getgenes=function(vcf)
+{
+  as.character(as.data.frame(vcf@info$Gene.refGene)$value)
+}
+
+pastemembers=function(characters)
+{
+  paste(characters,collapse = ",")
+}
+
+getcosmic=function(vcf)
+{
+  cosmic=unlist(lapply(vcf@info$cosmic,pastemembers))
+  cosmicID=as.character(lapply(strsplit(cosmic,":"),function(x){if(length(x)>1){x[2]}}))
+  return(list(cosmic=cosmic,cosmicID=cosmicID))
+}
+
+genes=getgenes(myvcf)
+cosmic=getcosmic(myvcf)
+thegenes=unique(genes)
+withcosmic=thegenes%in%genes[cosmic$cosmicID!="NULL"]
+withhaematopoietic=thegenes%in%genes[grep("haematopoietic",cosmic$cosmic)]
+
+df=data.frame(geneswithmutations=thegenes,
+              withcosmic=withcosmic,
+              withhaematopoietic=withhaematopoietic)
+strCaption <- paste0("\\textbf{Transversions and transitions} Statistically, transitions (A<->G and T<->C) are more probable than transversions (any other change) because the first are purine to purine or pyrimidine to pyrimidine. Human exome data is expected to have a transition/transversion ratio around 2-2.5.")
+print(xtable(df, digits=2, caption=strCaption, label="ti/tvratio"), 
+      size="footnotesize", #Change size; useful for bigger tables
+      include.rownames=FALSE, #Don't print rownames
+      include.colnames=FALSE, #We create them ourselves
+      caption.placement="top", 
+      hline.after=NULL, #We don't need hline; we use booktabs
+      add.to.row = list(pos = list(-1, 
+                                   nrow(df)),
+                        command = c(paste("\\toprule \n",
+                                          "Number of transversions & Number of transitions &  Ratio \\\\\n", 
+                                          "\\midrule \n"),
+                                    "\\bottomrule \n")
+                        )
+      )
+
+@
+\end{center}
 
 \section{Detailed results for small coding variants}
 
