@@ -1,0 +1,69 @@
+% # =======
+% #   License
+% # =======
+% #   This code is released under the GNU General Public License 3.0. A copy
+% # of this license is in the LICENSE.txt file.
+% # copyright Irina Krier 2015
+% # This program is free software: you can redistribute it and/or modify
+% # it under the terms of the GNU General Public License as published by
+% # the Free Software Foundation, either version 3 of the License, or
+% # (at your option) any later version.
+% # 
+% # This program is distributed in the hope that it will be useful,
+% # but WITHOUT ANY WARRANTY; without even the implied warranty of
+% # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% # GNU General Public License for more details.
+% # 
+% # You should have received a copy of the GNU General Public License
+% # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}  
+\usepackage[T1]{fontenc}
+\usepackage[frenchb]{babel}
+\usepackage{booktabs}
+\usepackage{graphicx, subfig}
+\usepackage[nogin]{Sweave}
+\usepackage{placeins}
+
+\makeatletter
+\renewcommand*{\thetable}{\arabic{table}}
+\renewcommand*{\thefigure}{\arabic{figure}}
+\let\c@table\c@figure
+\makeatother 
+
+\usepackage[a4paper, total={7in, 9in}]{geometry}
+
+\usepackage{wrapfig}
+
+\title{Variant calling and annotation report for library \Sexpr{libname}, DIAMIC sample \Sexpr{diamname}}
+\date{\today}
+\author{Irina Krier\\ UNIGE Département de Médecine
+        \and Thomas Matthes\\ HUG Cytométri}
+
+\begin{document}
+
+\SweaveOpts{concordance=TRUE}
+
+\maketitle
+
+\section{Summary statistics}
+ 
+% This section should include :
+% - The total number of variants found (off target and on target) after the filtering step
+% - The ratio of transversions to transitions (which should be around ts/tv=2-2.1) (only for the filtered set)
+% - Number of genes with a COSMIC mutatinons
+% - Number of genes with a routinely checked mutation
+
+\section{Detailed results for small coding variants}
+
+% For each gene, a list of the mutations with their allele frequency and the relevant annotation information from COSMIC hematopoietic, Phylophen, and from possibly other sources.
+% NPM1 will be included here
+
+\section{FLT3 insertion results}
+
+% This will read the pindelresults and output a yes/no and allele frequency result as well as the sequence of the insertion with coordinates if it is found.
+
+\end{document}
